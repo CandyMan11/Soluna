@@ -1,15 +1,22 @@
+/* Put imports FIRST */
+@import url('https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Croissant+One&display=swap');
 @import "tailwindcss";
 
 :root {
   --background: #ffffff;
   --foreground: #171717;
-}
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-sky-blue-50: #eefbfd;
+  --color-sky-blue-100: #d4f3f9;
+  --color-sky-blue-200: #aee7f3;
+  --color-sky-blue-300: #7ad6eb;
+  --color-sky-blue-400: #36b9da;
+  --color-sky-blue-500: #1b9cbf;
+  --color-sky-blue-600: #197ea1;
+  --color-sky-blue-700: #1b6683;
+  --color-sky-blue-800: #1f546b;
+  --color-sky-blue-900: #1e465b;
+  --color-sky-blue-950: #0e2d3e;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -22,5 +29,5 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Croissant One", serif; /* Default font */
 }
