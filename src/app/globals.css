@@ -1,11 +1,13 @@
-/* Put imports FIRST */
-@import url('https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Croissant+One&display=swap');
+/* The @import for Google Fonts has been removed to prevent conflicts. */
+/* Fonts are now handled exclusively by layout.tsx */
+
 @import "tailwindcss";
 
 :root {
   --background: #ffffff;
   --foreground: #171717;
 
+  /* Sky Blue Palette */
   --color-sky-blue-50: #eefbfd;
   --color-sky-blue-100: #d4f3f9;
   --color-sky-blue-200: #aee7f3;
@@ -17,6 +19,32 @@
   --color-sky-blue-800: #1f546b;
   --color-sky-blue-900: #1e465b;
   --color-sky-blue-950: #0e2d3e;
+
+  /* Apple Palette */
+  --color-apple-50: #f4faf3;
+  --color-apple-100: #e6f4e4;
+  --color-apple-200: #cce8ca;
+  --color-apple-300: #a3d5a0;
+  --color-apple-400: #73b96f;
+  --color-apple-500: #5aaf56;
+  --color-apple-600: #3c8039;
+  --color-apple-700: #31662f;
+  --color-apple-800: #2a5229;
+  --color-apple-900: #254324;
+  --color-apple-950: #0f240f;
+
+  /* Olive-Drab Palette */
+  --color-olive-drab-50: #f7f9ec;
+  --color-olive-drab-100: #ecf2d5;
+  --color-olive-drab-200: #dae6b0;
+  --color-olive-drab-300: #c0d581;
+  --color-olive-drab-400: #a7c15a;
+  --color-olive-drab-500: #89a63c;
+  --color-olive-drab-600: #799632;
+  --color-olive-drab-700: #526526;
+  --color-olive-drab-800: #435123;
+  --color-olive-drab-900: #3a4621;
+  --color-olive-drab-950: #1d260d;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -28,6 +56,13 @@
 
 body {
   background: var(--background);
-  color: var(--foreground);
-  font-family: "Croissant One", serif; /* Default font */
+}
+
+/* 🌲 Forest background with fade to transparent top */
+.bg-forest-fade {
+  background: linear-gradient(to top, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0)),
+              url("/bg1.jpeg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }

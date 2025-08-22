@@ -1,21 +1,24 @@
-import "./globals.css";
-import { Croissant_One } from "next/font/google";
+// soluna_mark3\src\app\layout.tsx
 
-const croissant = Croissant_One({
+import "./globals.css";
+import type { Metadata } from "next";
+import { Bodoni_Moda } from "next/font/google";
+
+const bodoni = Bodoni_Moda({
   subsets: ["latin"],
-  weight: "400",
-  variable: "--font-croissant",
+  weight: ["400", "700"],
 });
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Soluna",
   description: "Calm-inspired mental wellness app",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={croissant.variable}>
-      <body>{children}</body>
+    <html lang="en">
+      {/* Set Bodoni globally with the real .className from next/font */}
+      <body className={bodoni.className}>{children}</body>
     </html>
   );
 }
