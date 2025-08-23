@@ -1,5 +1,3 @@
-// soluna_mark3\src\app\page.tsx
-
 "use client";
 
 import Link from "next/link";
@@ -13,13 +11,14 @@ import { Croissant_One } from "next/font/google";
 
 const croissant = Croissant_One({ subsets: ["latin"], weight: "400" });
 
-type Firefly = { top: string; left: string; duration: string; delay: string };
+type Firefly = { x: number; y: number; vx: number; vy: number; glow: number };
 
 export default function HomePage() {
   const [pos, setPos] = useState({ x: 50, y: 50 });
   const targetRef = useRef({ x: 50, y: 50 });
   const [visible, setVisible] = useState(false);
   const [fireflies, setFireflies] = useState<Firefly[]>([]);
+  const mouseRef = useRef({ x: -9999, y: -9999 });
 
   // Smooth motion for shine
   useEffect(() => {
@@ -36,6 +35,24 @@ export default function HomePage() {
     return () => cancelAnimationFrame(raf);
   }, []);
 
+  // ✅ Track mouse globally
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      mouseRef.current = { x: e.clientX, y: e.clientY };
+    };
+    const handleMouseLeave = () => {
+      mouseRef.current = { x: -9999, y: -9999 };
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseleave", handleMouseLeave);
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseleave", handleMouseLeave);
+    };
+  }, []);
+
   const handleMove = (e: ReactMouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     targetRef.current = {
@@ -47,32 +64,114 @@ export default function HomePage() {
 
   const handleLeave = () => setVisible(false);
 
-  // Generate fireflies only on client
+  // Generate fireflies
   useEffect(() => {
-    const newFireflies = Array.from({ length: 11 }).map(() => ({
-      top: `${Math.random() * 100}%`,
-      left: `${Math.random() * 100}%`,
-      duration: `${12 + Math.random() * 8}s`,
-      delay: `${Math.random() * 5}s`,
+    const newFireflies = Array.from({ length: 17 }).map(() => ({
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight,
+      vx: (Math.random() - 0.5) * 0.2,
+      vy: (Math.random() - 0.5) * 0.2,
+      glow: 1,
     }));
     setFireflies(newFireflies);
   }, []);
 
+  // Animate fireflies
+  useEffect(() => {
+    let raf: number;
+    const animate = () => {
+      const mx = mouseRef.current.x;
+      const my = mouseRef.current.y;
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      const margin = 5;
+
+      const quadrantCounts = [0, 0, 0, 0];
+      fireflies.forEach((f) => {
+        const q = f.x < width / 2 ? (f.y < height / 2 ? 0 : 2) : (f.y < height / 2 ? 1 : 3);
+        quadrantCounts[q]++;
+      });
+      const avg = fireflies.length / 4;
+
+      setFireflies((flies) =>
+        flies.map((f) => {
+          let { x, y, vx, vy, glow } = f;
+
+          const dx = x - mx;
+          const dy = y - my;
+          const dist = Math.sqrt(dx * dx + dy * dy) || 0.0001;
+
+          // repel
+          if (dist < 50) {
+            vx += (dx / dist) * 0.05;
+            vy += (dy / dist) * 0.05;
+            glow = Math.min(1.8, glow + 0.05);
+          } else {
+            glow = Math.max(1, glow - 0.02);
+          }
+
+          x += vx;
+          y += vy;
+
+          vx += (Math.random() - 0.5) * 0.003;
+          vy += (Math.random() - 0.5) * 0.003;
+
+          const maxSpeed = dist < 50 ? 0.3 : 0.2;
+          vx = Math.max(-maxSpeed, Math.min(maxSpeed, vx));
+          vy = Math.max(-maxSpeed, Math.min(maxSpeed, vy));
+
+          // bounce
+          if (x < margin) {
+            x = margin;
+            vx *= -1;
+          } else if (x > width - margin) {
+            x = width - margin;
+            vx *= -1;
+          }
+          if (y < margin) {
+            y = margin;
+            vy *= -1;
+          } else if (y > height - margin) {
+            y = height - margin;
+            vy *= -1;
+          }
+
+          // quadrant rebalance
+          const q = x < width / 2 ? (y < height / 2 ? 0 : 2) : (y < height / 2 ? 1 : 3);
+          if (quadrantCounts[q] > avg + 1.5) {
+            const bias = (quadrantCounts[q] - avg) * 0.005;
+            if (q === 0 || q === 2) vx += bias;
+            else vx -= bias;
+            if (q === 0 || q === 1) vy += bias;
+            else vy -= bias;
+          }
+
+          return { x, y, vx, vy, glow };
+        })
+      );
+
+      raf = requestAnimationFrame(animate);
+    };
+    raf = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(raf);
+  }, [fireflies]);
+
   return (
     <main className="bg-forest-fade min-h-screen w-full flex flex-col items-center justify-center p-8 relative overflow-hidden">
-      {/* Fireflies Layer */}
+      {/* Fireflies */}
       <div className="absolute inset-0 pointer-events-none">
         {fireflies.map((f, i) => (
           <span
             key={i}
-            className="absolute w-[0.4rem] h-[0.4rem] rounded-full animate-firefly"
+            className="absolute w-[0.7rem] h-[0.7rem] rounded-full"
             style={{
-              backgroundColor: "#f8f38d", // yellowish glow
-              top: f.top,
-              left: f.left,
-              animationDuration: f.duration,
-              animationDelay: f.delay,
+              backgroundColor: "#f8f38d",
+              top: f.y,
+              left: f.x,
               filter: "blur(1px)",
+              opacity: Math.max(0.3, Math.min(1, 0.8 * f.glow)),
+              boxShadow: `0 0 ${6 * f.glow}px ${3 * f.glow}px rgba(248,243,141,0.6)`,
+              transition: "opacity 0.2s, box-shadow 0.2s",
             }}
           />
         ))}
@@ -90,7 +189,7 @@ export default function HomePage() {
         whatever floats your boat
       </p>
 
-      {/* Shiny rectangle */}
+      {/* Shiny Rectangle */}
       <div
         onMouseMove={handleMove}
         onMouseLeave={handleLeave}
@@ -104,7 +203,6 @@ export default function HomePage() {
           How are you feeling today?
         </Link>
 
-        {/* Shine Layer */}
         <span
           className="absolute inset-0 rounded-xl pointer-events-none"
           style={{
