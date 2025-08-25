@@ -77,84 +77,72 @@ export default function HomePage() {
   }, []);
 
   // Animate fireflies
-  useEffect(() => {
-    let raf: number;
-    const animate = () => {
-      const mx = mouseRef.current.x;
-      const my = mouseRef.current.y;
-      const width = window.innerWidth;
-      const height = window.innerHeight;
-      const margin = 5;
+  // Animate fireflies
+useEffect(() => {
+  let raf: number;
+  const animate = () => {
+    const mx = mouseRef.current.x;
+    const my = mouseRef.current.y;
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    const margin = 5;
 
-      const quadrantCounts = [0, 0, 0, 0];
-      fireflies.forEach((f) => {
-        const q = f.x < width / 2 ? (f.y < height / 2 ? 0 : 2) : (f.y < height / 2 ? 1 : 3);
-        quadrantCounts[q]++;
-      });
-      const avg = fireflies.length / 4;
+    setFireflies((flies) =>
+      flies.map((f) => {
+        let { x, y, vx, vy, glow } = f;
 
-      setFireflies((flies) =>
-        flies.map((f) => {
-          let { x, y, vx, vy, glow } = f;
+        const dx = x - mx;
+        const dy = y - my;
+        const dist = Math.sqrt(dx * dx + dy * dy) || 0.0001;
 
-          const dx = x - mx;
-          const dy = y - my;
-          const dist = Math.sqrt(dx * dx + dy * dy) || 0.0001;
+        // repel if mouse is close
+        if (dist < 50) {
+          vx += (dx / dist) * 0.05;
+          vy += (dy / dist) * 0.05;
+          glow = Math.min(1.8, glow + 0.05);
+        } else {
+          glow = Math.max(1, glow - 0.02);
+        }
 
-          // repel
-          if (dist < 50) {
-            vx += (dx / dist) * 0.05;
-            vy += (dy / dist) * 0.05;
-            glow = Math.min(1.8, glow + 0.05);
-          } else {
-            glow = Math.max(1, glow - 0.02);
-          }
+        // update position
+        x += vx;
+        y += vy;
 
-          x += vx;
-          y += vy;
+        // add gentle random drifting so they never clump
+        vx += (Math.random() - 0.5) * 0.01;
+        vy += (Math.random() - 0.5) * 0.01;
 
-          vx += (Math.random() - 0.5) * 0.003;
-          vy += (Math.random() - 0.5) * 0.003;
+        // keep them slow and floaty
+        const maxSpeed = 0.25;
+        vx = Math.max(-maxSpeed, Math.min(maxSpeed, vx));
+        vy = Math.max(-maxSpeed, Math.min(maxSpeed, vy));
 
-          const maxSpeed = dist < 50 ? 0.3 : 0.2;
-          vx = Math.max(-maxSpeed, Math.min(maxSpeed, vx));
-          vy = Math.max(-maxSpeed, Math.min(maxSpeed, vy));
+        // bounce off edges
+        if (x < margin) {
+          x = margin;
+          vx *= -1;
+        } else if (x > width - margin) {
+          x = width - margin;
+          vx *= -1;
+        }
+        if (y < margin) {
+          y = margin;
+          vy *= -1;
+        } else if (y > height - margin) {
+          y = height - margin;
+          vy *= -1;
+        }
 
-          // bounce
-          if (x < margin) {
-            x = margin;
-            vx *= -1;
-          } else if (x > width - margin) {
-            x = width - margin;
-            vx *= -1;
-          }
-          if (y < margin) {
-            y = margin;
-            vy *= -1;
-          } else if (y > height - margin) {
-            y = height - margin;
-            vy *= -1;
-          }
+        return { x, y, vx, vy, glow };
+      })
+    );
 
-          // quadrant rebalance
-          const q = x < width / 2 ? (y < height / 2 ? 0 : 2) : (y < height / 2 ? 1 : 3);
-          if (quadrantCounts[q] > avg + 1.5) {
-            const bias = (quadrantCounts[q] - avg) * 0.005;
-            if (q === 0 || q === 2) vx += bias;
-            else vx -= bias;
-            if (q === 0 || q === 1) vy += bias;
-            else vy -= bias;
-          }
-
-          return { x, y, vx, vy, glow };
-        })
-      );
-
-      raf = requestAnimationFrame(animate);
-    };
     raf = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(raf);
-  }, [fireflies]);
+  };
+  raf = requestAnimationFrame(animate);
+  return () => cancelAnimationFrame(raf);
+}, []);
+
 
   return (
     <main className="bg-forest-fade min-h-screen w-full flex flex-col items-center justify-center p-8 relative overflow-hidden">
