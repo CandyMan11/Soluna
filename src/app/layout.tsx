@@ -1,4 +1,4 @@
-// soluna_mark3\src\app\layout.tsx
+// soluna_mark3/src/app/layout.tsx
 
 import "./globals.css";
 import type { Metadata } from "next";
@@ -17,7 +17,13 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      {/* Set Bodoni globally with the real .className from next/font */}
+      <head>
+        {/* ✅ Load Material Symbols here */}
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@400&display=swap"
+        />
+      </head>
       <body className={bodoni.className}>{children}</body>
     </html>
   );

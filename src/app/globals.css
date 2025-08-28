@@ -1,9 +1,20 @@
-/* soluna_mark3\src\app\globals.css */
+/* soluna_mark3/src/app/globals.css */
+
+/* All @imports must come first */
+@import "tailwindcss";
 
 /* The @import for Google Fonts has been removed to prevent conflicts. */
 /* Fonts are now handled exclusively by layout.tsx */
 
-@import "tailwindcss";
+/* ✅ Material Symbols config (without @import) */
+.material-symbols-outlined {
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 40;
+  vertical-align: middle;
+}
 
 :root {
   --background: #ffffff;
@@ -47,6 +58,32 @@
   --color-olive-drab-800: #435123;
   --color-olive-drab-900: #3a4621;
   --color-olive-drab-950: #1d260d;
+
+  /* Black Palette */
+  --color-black-50: #f6f6f6;
+  --color-black-100: #e7e7e7;
+  --color-black-200: #d1d1d1;
+  --color-black-300: #b0b0b0;
+  --color-black-400: #888888;
+  --color-black-500: #6d6d6d;
+  --color-black-600: #5d5d5d;
+  --color-black-700: #4f4f4f;
+  --color-black-800: #454545;
+  --color-black-900: #3d3d3d;
+  --color-black-950: #000000;
+
+  /* Saddle Palette */
+  --color-saddle-50: #f8f5ee;
+  --color-saddle-100: #efe6d2;
+  --color-saddle-200: #e1cca7;
+  --color-saddle-300: #cfab75;
+  --color-saddle-400: #c08e4f;
+  --color-saddle-500: #b17a41;
+  --color-saddle-600: #986036;
+  --color-saddle-700: #7a482e;
+  --color-saddle-800: #673c2c;
+  --color-saddle-900: #533127;
+  --color-saddle-950: #331b15;
 }
 
 @media (prefers-color-scheme: dark) {
